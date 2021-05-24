@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capture Face</title>
+</head>
+
+<body>
+  <video id="player" controls autoplay></video>
+  <button id="capture">Capture</button>
+  <canvas id="canvas" width=240 height=240></canvas>
+
+  <!-- so that '$' will be defined -->
+  <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+  <script>
+    alert("This app requires your camera acces to click your picture so that it can suggest you the song as per your mood");
+
+    const player = document.getElementById('player');
+    const canvas = document.getElementById('canvas');
+    const context = canvas.getContext('2d');
+    const captureButton = document.getElementById('capture');
+
+    const constraints = { video: { height: 240, width: 240 } };
+
+    captureButton.addEventListener('click', function () {
+      context.drawImage(player, 0, 0, canvas.width, canvas.height);
+      let dataURL = canvas.toDataURL('image/png');
+      $.ajax({
+        type: "POST",
+        url: "/predict",
+        data: {
+          imgBase64: dataURL
+        },
+        success: function (response) { document.write(response); }
+      }).done(function (o) {
+        console.log('saved');
+      });
+
+      player.srcObject.getVideoTracks().forEach(track => track.stop());
+    });
+
+    navigator.mediaDevices.getUserMedia(constraints)
+      .then((stream) => {
+        player.srcObject = stream;
+      });
+  </script>
+
+</body>
+
+</html>
