@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Songs as per your mood</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap');
+
+        * {
+            margin: 0px;
+            padding: 0px;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 62.5%;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .text-white {
+            color: white;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .header {
+            background-image: url('static/bgd.jpg');
+            height: 80vh;
+            width: 100vw;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        .header #icon {
+            position: relative;
+            top: 10%;
+            left: 10%;
+            font-size: 3rem;
+            color: #ccc;
+            font-family: 'Dancing Script', cursive;
+            font-weight: bold;
+        }
+
+        .header #recommend {
+            font-size: 5.6rem;
+            margin-top: 1.5em;
+        }
+
+        .header h2 {
+            font-size: 3.5rem;
+            margin-top: 1.3em;
+        }
+
+        .header #emotion {
+            text-transform: uppercase;
+            font-size: 4rem;
+            margin-top: 1.3em;
+            text-shadow: white;
+            margin-bottom: 1.4rem;
+        }
+
+        .header #frame {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 70%;
+        }
+
+        #frame_set {
+            height: 9rem;
+            width: 38rem;
+            border-radius: 3rem;
+            box-shadow: 0 0 35rem 2rem rgb(0, 132, 255);
+        }
+
+        .btn {
+            position: sticky;
+            background-color: #C0C0C0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            top: 0px;
+        }
+
+        .btn #Before-1980s,
+        .btn #eighties,
+        .btn #ninties,
+        .btn #twothousand,
+        .btn #present {
+            border: rgb(253, 252, 252) 2px solid;
+            background-image: linear-gradient(to bottom right, black, rgb(19, 27, 53));
+            font-size: 2rem;
+            padding: 0.5em;
+            margin: 0.5em;
+            border-radius: 2rem;
+            cursor: pointer;
+        }
+
+        #Before-1980s:hover,
+        #eighties:hover,
+        #ninties:hover,
+        #twothousand:hover,
+        #present:hover {
+            box-shadow: 0 0 10px rgb(219, 12, 12);
+            transform: scale(1.1);
+        }
+
+        .container {
+            background-image: linear-gradient(black, rgb(54, 54, 54), rgb(160, 151, 155));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container .song_place {
+            border-radius: 12px;
+            width: 50vw;
+        }
+
+        .song_place #song_list {
+            background-color: rgb(88, 88, 88);
+            border-radius: 12px;
+            box-shadow: 0 0 2rem 1rem white;
+        }
+
+        .song_place #current {
+            background-color: white;
+            border-bottom: 4px solid blue;
+            color: black;
+            font-size: 3rem;
+            font-weight: bold;
+            margin-top: 2rem;
+            margin-bottom: 4rem;
+            padding: 1rem 1rem 1rem 2rem;
+            box-shadow: 0 0 1rem 1.2rem white;
+        }
+
+        a {
+            font-size: 1.6rem;
+            display: block;
+            text-decoration: none;
+            color: white;
+            border: 2px white solid;
+            border-radius: 12px;
+            padding: 0.8em;
+        }
+
+        ol li {
+            list-style-type: none;
+            padding: 0.8%;
+            border: thick white solid;
+        }
+    </style>
+</head>
+
+<body>
+    <header class='header'>
+        <div id='icon'>Music</div>
+        <h1 id='recommend' class='text-white text-center'>Hindi Songs Recommendation</h1><br>
+        <h2 class='text-white text-center'>Your Current Emotion Found</h2>
+        <h3 id=emotion class='text-white text-center'></h3>
+        <div id='frame'></div>
+    </header>
+
+    <p class='btn'>
+        <button id='Before-1980s' class='text-white' title="click for before 1980s songs list" onclick="list_before_1980s()">Before-1980s</button>
+        <button id='eighties' class='text-white' title="click for 1980s decade songs list" onclick="list_1980s()">1980s</button>
+        <button id='ninties' class='text-white' title="click of 1990s decade songs list" onclick="list_1990s()">1990s</button>
+        <button id='twothousand' class='text-white' title="click for 2000s decade songs list" onclick="list_2000s()">2000s</button>
+        <button id='present' class='text-white' title="click for 2010s to present decade songs list" onclick="list_2010s()">2010s-Present</button>
+    </p>
+
+    <div class="container">
+        <div class='song_place'>
+            <p id='current'></p>
+            <ol id='song_list'></ol>
+        </div>
+    </div>
+
+
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+    <script>
+        let result = JSON.parse({{ song_data| tojson | safe}});
+        document.getElementById('emotion').innerHTML = result.user_emotion;
+
+        document.getElementById('frame').innerHTML = "";
+        let frame = document.getElementById('frame');
+        var [song_name, song_link] = result['result']['Hindi']['2010 - Present'][0];
+        var iframe = document.createElement("IFRAME");
+        iframe.id = 'frame_set';
+        iframe.seamless = '';
+        iframe.scrolling = 'no';
+        iframe.src = song_link;
+        iframe.name = 'play_this';
+        document.getElementById('frame').appendChild(iframe);
+        document.getElementById('current').innerHTML = 'Default song is from 2010 to Present Song list';
+
+        function list_before_1980s() {
+            document.getElementById('current').innerHTML = 'Before_1980s Songs';
+            Songs_links('Before - 1980s');
+        }
+
+        function list_1980s() {
+            document.getElementById('current').innerHTML = '1980s Songs';
+            Songs_links('1980s');
+        }
+
+        function list_1990s() {
+            document.getElementById('current').innerHTML = '1990s Songs';
+            Songs_links('1990s');
+        }
+
+        function list_2000s() {
+            document.getElementById('current').innerHTML = '2000s Songs';
+            Songs_links('2000s');
+        }
+
+        function list_2010s() {
+            document.getElementById('current').innerHTML = '2010 to Present Songs';
+            Songs_links('2010 - Present');
+        }
+
+        function Songs_links(decade) {
+            document.getElementById('song_list').innerHTML = "";
+            for (var i = 0; i < result['result']['Hindi'][decade].length; i++) {
+
+                var [a, b] = result['result']['Hindi'][decade][i];
+
+                var anchor = document.createElement("a");
+                var new_line = document.createElement('LI');
+
+                var song_name = document.createTextNode(i + 1 + '.' + ' ' + a);
+                anchor.appendChild(song_name);
+
+                anchor.target = 'play_this';
+                anchor.title = 'Click on it to play this song';
+                anchor.href = b;
+                new_line.appendChild(anchor);
+                document.getElementById("song_list").appendChild(new_line);
+            }
+        }
+    </script>
+</body>
+
+</html>
