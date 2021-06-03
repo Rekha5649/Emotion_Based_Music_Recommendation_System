@@ -6,14 +6,104 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Capture Face</title>
+
+  <style>
+    /* remove all default padding and margin*/
+    * {
+      margin: 0px;
+      padding: 0px;
+      box-sizing: border-box;
+    }
+
+    html {
+      /* changed default 16px to 10px(1rem) value */
+      font-size: 62.5%;
+    }
+
+    body {
+      overflow-x: hidden;
+      background: url('static/image.jpg');
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+      background-size: cover;
+    }
+
+    .header {
+      padding: 1.6rem;
+      margin-bottom: 4rem;
+      background-color: black;
+      color: white;
+      font-family: cursive;
+      text-align: center;
+      font-size: 4.5rem;
+      width: 100%;
+      height: 15vh;
+    }
+
+    .align-center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn {
+      width: 62.5rem;
+      background: grey;
+      font-weight: bold;
+      font-family: cursive;
+      font-size: 4rem;
+      border-radius: 30%;
+      border: 1rem solid;
+      transition: all 0.5s;
+      cursor: pointer;
+      margin-bottom: 1rem;
+      padding: 1rem;
+    }
+
+    .btn:hover span {
+      padding-right: 2.5rem;
+    }
+
+    .videoObject {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #player {
+      border: 12px solid rgb(58, 58, 58);
+      background: white;
+      height: 26.4rem;
+      width: 32.4rem;
+    }
+
+    #canvas {
+      border: 12px solid rgb(58, 58, 58);
+      background: white;
+      height: 26.4rem;
+      width: 32.4rem;
+      margin-left: 2rem;
+    }
+  </style>
+
 </head>
 
 <body>
-  <video id="player" controls autoplay></video>
-  <button id="capture">Capture</button>
-  <canvas id="canvas" width=240 height=240></canvas>
+  <div class="header">
+    <p>SONGS RECOMMENDATION BASED ON YOUR CURRENT MOOD</p>
+  </div>
 
-  <!-- so that '$' will be defined -->
+  <div class='align-center'>
+    <button id="capture" class="btn" title="Click">Click to capture<span> </span></button>
+  </div>
+
+  <div class="videoObject">
+    <video id="player" controls autoplay></video>
+    <canvas id="canvas" width=300 height=240></canvas>
+  </div>
+
+
   <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
   <script>
     alert("This app requires your camera acces to click your picture so that it can suggest you the song as per your mood");
@@ -23,12 +113,16 @@
     const context = canvas.getContext('2d');
     const captureButton = document.getElementById('capture');
 
-    const constraints = { video: { height: 240, width: 240 } };
+    const constraints = { video: { height: 240, width: 300 } };
 
     captureButton.addEventListener('click', function () {
       context.drawImage(player, 0, 0, canvas.width, canvas.height);
+
+      // convert canvas picture data into data url 
       let dataURL = canvas.toDataURL('image/png');
-      $.ajax({
+
+      // ajax request to send the data
+      jQuery.ajax({
         type: "POST",
         url: "/predict",
         data: {
@@ -39,12 +133,15 @@
         console.log('saved');
       });
 
+      // stop video after capturing picture
       player.srcObject.getVideoTracks().forEach(track => track.stop());
     });
 
     navigator.mediaDevices.getUserMedia(constraints)
       .then((stream) => {
         player.srcObject = stream;
+      }).catch(function (error) {
+        console.log(error);
       });
   </script>
 

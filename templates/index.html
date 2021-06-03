@@ -8,9 +8,12 @@
     <title>Songs as per your mood</title>
 
     <style>
+
+        /* import  'Montserrat' and 'Dancing+script' font family */
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&display=swap');
         @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap');
 
+        /* remove all default padding and margin*/
         * {
             margin: 0px;
             padding: 0px;
@@ -18,11 +21,13 @@
         }
 
         html {
+            /* changed default 16px to 10px(1rem) value */
             font-size: 62.5%;
         }
 
         body {
             font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
         }
 
         .text-white {
@@ -166,6 +171,8 @@
 </head>
 
 <body>
+    
+    <!-- set header of the page -->
     <header class='header'>
         <div id='icon'>Music</div>
         <h1 id='recommend' class='text-white text-center'>Hindi Songs Recommendation</h1><br>
@@ -174,6 +181,7 @@
         <div id='frame'></div>
     </header>
 
+    <!-- buttons to choose music decade -->
     <p class='btn'>
         <button id='Before-1980s' class='text-white' title="click for before 1980s songs list" onclick="list_before_1980s()">Before-1980s</button>
         <button id='eighties' class='text-white' title="click for 1980s decade songs list" onclick="list_1980s()">1980s</button>
@@ -182,71 +190,96 @@
         <button id='present' class='text-white' title="click for 2010s to present decade songs list" onclick="list_2010s()">2010s-Present</button>
     </p>
 
+    <!-- container for music list -->
     <div class="container">
         <div class='song_place'>
+
+            <!-- Show decade of the song list -->
             <p id='current'></p>
+
             <ol id='song_list'></ol>
         </div>
     </div>
 
 
-    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
     <script>
+        
+        // parse data coming from app.py
         let result = JSON.parse({{ song_data| tojson | safe}});
+        
+        // set emotion for element containig id = emotion
         document.getElementById('emotion').innerHTML = result.user_emotion;
 
+        // empty containt every time the button is clicked
         document.getElementById('frame').innerHTML = "";
+
         let frame = document.getElementById('frame');
+
+        // extract song_name and song_link from the data
         var [song_name, song_link] = result['result']['Hindi']['2010 - Present'][0];
+
         var iframe = document.createElement("IFRAME");
+
+        // set parameters for the frame
         iframe.id = 'frame_set';
         iframe.seamless = '';
         iframe.scrolling = 'no';
         iframe.src = song_link;
         iframe.name = 'play_this';
         document.getElementById('frame').appendChild(iframe);
+
+        // default containt for the decade of songs_list
         document.getElementById('current').innerHTML = 'Default song is from 2010 to Present Song list';
 
+        // function to set the heading for the before-1980s songs and provide the list of the songs
         function list_before_1980s() {
             document.getElementById('current').innerHTML = 'Before_1980s Songs';
             Songs_links('Before - 1980s');
         }
 
+        // function to set the heading for the 1980s songs and provide the list of the songs
         function list_1980s() {
             document.getElementById('current').innerHTML = '1980s Songs';
             Songs_links('1980s');
         }
 
+        // function to set the heading for the 1990s songs and provide the list of the songs
         function list_1990s() {
             document.getElementById('current').innerHTML = '1990s Songs';
             Songs_links('1990s');
         }
 
+        // function to set the heading for the 2000s songs and provide the list of the songs
         function list_2000s() {
             document.getElementById('current').innerHTML = '2000s Songs';
             Songs_links('2000s');
         }
 
+        // function to set the heading for the 2010-Present songs and provide the list of the songs
         function list_2010s() {
             document.getElementById('current').innerHTML = '2010 to Present Songs';
             Songs_links('2010 - Present');
         }
 
+        // function to provie the list of the songs
         function Songs_links(decade) {
             document.getElementById('song_list').innerHTML = "";
             for (var i = 0; i < result['result']['Hindi'][decade].length; i++) {
 
+                // extract song_name and song_link
                 var [a, b] = result['result']['Hindi'][decade][i];
 
                 var anchor = document.createElement("a");
                 var new_line = document.createElement('LI');
-
+                
+                // set the attributes of the anchor tag
                 var song_name = document.createTextNode(i + 1 + '.' + ' ' + a);
                 anchor.appendChild(song_name);
-
                 anchor.target = 'play_this';
                 anchor.title = 'Click on it to play this song';
                 anchor.href = b;
+
+                // append the anchor to list element
                 new_line.appendChild(anchor);
                 document.getElementById("song_list").appendChild(new_line);
             }
