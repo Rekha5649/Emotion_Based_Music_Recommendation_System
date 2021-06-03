@@ -1,21 +1,23 @@
-import numpy as np
 from flask import Flask, request, render_template
-from keras.models import load_model
-import cv2
-import numpy as np
 from keras.preprocessing.image import img_to_array
-import base64
+from keras.models import load_model
 from flask_mysqldb import MySQL
+import numpy as np
+import base64
+import cv2
 import json
 
-
+# create flask app
 app = Flask(__name__)
+
+# trained model
 classifier = load_model('model_emotion.h5')
 
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'music'
+# Heroku database configurations
+app.config['MYSQL_HOST'] = 'us-cdbr-east-04.cleardb.com'
+app.config['MYSQL_USER'] = 'b7a9ad7e9a717d'
+app.config['MYSQL_PASSWORD'] = '2a1a1be3'
+app.config['MYSQL_DB'] = 'heroku_efa553e0c9160b4'
 mysql = MySQL(app)
 
 
@@ -26,6 +28,7 @@ def home():
 
 @app.route('/predict', methods = ['GET', 'POST'])
 def predict():
+    # check if the request is post
     if request.method == "POST":
         data = request.values['imgBase64']  
         encoded_data = data.split(',')[1]
@@ -37,6 +40,7 @@ def predict():
         class_labels = ['angry', 'fear', 'happy', 'neutral', 'sad']
         face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
 
+        # converting image to gray scale
         gray = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
         faces = face_cascade.detectMultiScale(gray,1.3,5)
                 
@@ -52,11 +56,12 @@ def predict():
                 roi = img_to_array(roi)
                 roi = np.expand_dims(roi,axis=0)
 
+                # predict what is the emotion
                 preds = classifier.predict(roi)[0]
                 label=class_labels[preds.argmax()]
-            
-            print(label)
+        
         else:
+            # if the face is not found
             label = 'Face not found be sure there is enough light.'
             
 
@@ -74,7 +79,7 @@ def predict():
             if item[1] not in decade_dict[item[0]].keys():
                 decade_dict[item[0]][item[1]] = list()
             decade_dict[item[0]][item[1]].append(tuple([item[2],item[3]]))
-        # print(decade_dict)
+    
         parameters = {'user_emotion': label, 'result': decade_dict }
         return render_template('index.html', song_data = json.dumps(parameters))
 
