@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 28, 2021 at 09:54 PM
+-- Generation Time: Jun 04, 2021 at 05:28 AM
 -- Server version: 10.4.18-MariaDB
 -- PHP Version: 7.3.27
 
@@ -15,7 +15,7 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+/*!40101 SET NAMES utf8 */;
 
 --
 -- Database: `music`
@@ -29,12 +29,12 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `songs` (
   `Song_ID` int(11) NOT NULL,
-  `Song_name` varchar(200) NOT NULL,
+  `Song_name` varchar(100) NOT NULL,
   `Emotion` varchar(10) NOT NULL,
-  `Langue` varchar(25) DEFAULT NULL,
-  `Decade` varchar(30) DEFAULT NULL,
-  `Song_url` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `Langue` varchar(25) NOT NULL,
+  `Decade` varchar(30) NOT NULL,
+  `Song_url` varchar(200) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `songs`
@@ -553,8 +553,7 @@ INSERT INTO `songs` (`Song_ID`, `Song_name`, `Emotion`, `Langue`, `Decade`, `Son
 --
 ALTER TABLE `songs`
   ADD PRIMARY KEY (`Song_name`),
-  ADD UNIQUE KEY `UK_SONGS_ID` (`Song_ID`),
-  ADD KEY `FK_Emotion_SONGS` (`Emotion`);
+  ADD UNIQUE KEY `UK_SONGS_ID` (`Song_ID`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -565,16 +564,6 @@ ALTER TABLE `songs`
 --
 ALTER TABLE `songs`
   MODIFY `Song_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=505;
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `songs`
---
-ALTER TABLE `songs`
-  ADD CONSTRAINT `FK_Emotion_SONGS` FOREIGN KEY (`Emotion`) REFERENCES `emotions` (`Emotion`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
